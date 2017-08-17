@@ -522,7 +522,7 @@ namespace ImagePratice_1
             setRGBData_unsafe(newRGBData);
         }
 
-
+        //k-means 分群法
         public int kmeansCount = 0;
         public void doKmeans(int[, ,] rgbData, int k)
         {
@@ -530,8 +530,7 @@ namespace ImagePratice_1
             int Width = bimage.Width;
             int Height = bimage.Height;
 
-            //設定 K 與 隨機初始值u(顏色)
-            //int[] u = new int[k];
+            /*設定 K 與 隨機初始值u(顏色)黑白
             int[] u = new int[k];
             for (int i = 0; i < k; i++)
             {
@@ -545,15 +544,45 @@ namespace ImagePratice_1
                         u[i] = rnd.Next(0, 255);
                     }
                 }
-            }
-            
+            }*/
+            //彩色
+            //u[k, R、G、B]
+            int[,] u = new int[k,3];
+            /*for (int i = 0; i < k; i++)
+            {
+                Random rnd = new Random();
+                for (int j = 0; j < 3; j++)
+                {
+                    u[i, j] = rnd.Next(0, 255);
+                }
+                for (int j = 0; j < i; j++)
+                {
+                    while (u[j, 0] == u[i, 0] && u[j, 1] == u[i, 1] && u[j, 2] == u[i, 2])
+                    {
+                        j = 0;
+                        u[i, 0] = rnd.Next(0, 255);
+                        u[i, 1] = rnd.Next(0, 255);
+                        u[i, 2] = rnd.Next(0, 255);
+                    }
+                }
+            }*/
 
-            int[,] group = new int[Width, Height];
+            //學長的種子點
+            for (int i = 0; i < k; i++)
+            {
+                u[i, 0] = ((255 / k) * i);
+                u[i, 1] = ((255 / k) * i);
+                u[i, 2] = ((255 / k) * i);
+            }
+
+            /*for(int i=0;i<k;i++)
+            {
+                Console.Write(u[0, i] + "," + u[1, i] + "," + u[2, i] + "\n");
+            }*/
+
             kmeansCount = 0;
             //遞迴->統計、歸類->新群
-            //kmeansClustering(rgbData, u, Width, Height);
-
-            KmeansData kmeansdata = new KmeansData(rgbData, u, Width, Height);
+            KmeansData kmeansdata = new KmeansData(rgbData, k, u, Width, Height);
 
             int[, ,] newRGBData = new int[Width, Height, 3];
             for (int y = 0; y < Height; y++)
@@ -563,22 +592,34 @@ namespace ImagePratice_1
                     for(int i=0;i<3;i++)
                     {
                         //新圖片設值
-                        newRGBData[x, y, i] = kmeansdata.u[kmeansdata.group[x, y]]; //u[group[x,y]]
+                        //黑白
+                        /*newRGBData[x, y, i] = kmeansdata.u[kmeansdata.group[x, y]]; //u[group[x,y]]*/
+                        //彩色
+                        newRGBData[x, y, i] = kmeansdata.u[kmeansdata.group[x, y, i], i];
                     }
                 }
             }
             setRGBData_unsafe(newRGBData);
-            Console.Write(u[0]+","+u[1]+","+u[2]+"\n");
+            //Console.Write(u[0]+","+u[1]+","+u[2]+"\n");
         }
 
         public class KmeansData
         {
             private int[, ,]rgbData;
-            public int[] u;
+            private int k;
+            public int[,] u;
             private int Width;
             private int Height;
-            public int[,] group;
-            private int[,] coSet;
+            //紀錄圖片上每個點分別屬於哪個群
+            /*黑白
+            public int[,] group;*/
+            //彩色
+            public int[, ,] group;
+            //累加[x,0]此群值的集合與統計[x,1]群裡點的個數
+            /*黑白
+            private int[,] coSet;*/
+            //彩色
+            private int[, ,] coSet;
 
             private int count;
 
@@ -586,38 +627,41 @@ namespace ImagePratice_1
             {
                 //空白建構元
                 this.rgbData=new int[0, 0, 0];
-                this.u = new int[0];
+                this.k =0;
+                this.u = new int[0, 0];
                 this.Width = 0;
                 this.Height = 0;
-                this.group = new int[0, 0];
-                this.coSet = new int[0, 0];
+                this.group = new int[0, 0, 0];
+                this.coSet = new int[0, 0 ,0];
 
                 this.count = 0;
             }
 
-            public KmeansData(int[, ,] rgbData, int[] u, int Width, int Height)
+            public KmeansData(int[, ,] rgbData, int k, int[,] u, int Width, int Height)
             {
                 this.count = 0;
 
                 this.rgbData = rgbData;
+                this.k = k;
                 this.u = u;
                 this.Width = Width;
                 this.Height = Height;
-                this.group = new int[Width, Height];
-                //值集合與群裡點的個數
-                this.coSet = new int[u.Length, 2];
+                this.group = new int[Width, Height, 3];
+                this.coSet = new int[k, 2, 3];
 
                 //KmeansData kmeansdata = new KmeansData(this.rgbData, this.u, this.Width, this.Height);
                 cluster(this.u);
             }
 
-            private int  cluster(int[] u)
+            private int  cluster(int[,] u)
             {
                 for (int y = 0; y < Height; y++)
                 {
                     for (int x = 0; x < Width; x++)
                     {
-                        double minDest = Math.Pow(rgbData[x, y, 0] - u[0], 2);
+                        //分類點的群
+                        //黑白
+                        /*double minDest = Math.Pow(rgbData[x, y, 0] - u[0], 2);
                         group[x, y] = 0;
 
                         for (int i = 1; i < u.Length; i++)
@@ -631,32 +675,81 @@ namespace ImagePratice_1
                         //累加值
                         coSet[group[x, y], 0] += rgbData[x, y, 0];
                         //計算個數
-                        coSet[group[x, y], 1]++;
+                        coSet[group[x, y], 1]++;*/
+                        //彩色
+                        for (int i = 0; i < 3; i++)
+                        {
+                            double minDest = Math.Pow(rgbData[x, y, 0] - u[0, i], 2);
+                            group[x, y, i] = 0;
+
+                            for (int j = 1; j < this.k; j++)
+                            {
+                                if (Math.Pow(rgbData[x, y, 0] - u[j, i], 2) < minDest)
+                                {
+                                    minDest = Math.Pow(rgbData[x, y, 0] - u[j, i], 2);
+                                    group[x, y, i] = j;
+                                }
+                            }
+                            //累加值
+                            coSet[group[x, y, i], 0, i] += rgbData[x, y, 0];
+                            //計算個數
+                            coSet[group[x, y, i], 1, i]++;
+                        }
+                        
                     }
                 }
-
                 //上一個群中心
-                int[] pre_u = new int[u.Length];
-                Array.Copy(u, pre_u, u.Length);
+                //黑白
+                /*int[] pre_u = new int[u.Length];*/
+                //彩色
+                int[,] pre_u = new int[this.k, 3];
 
+                Array.Copy(u, pre_u, u.Length);
                 //計算中心
-                for (int i = 0; i < u.Length; i++)
+                //黑白
+                /*for (int i = 0; i < u.Length; i++)
                 {
                     //待處理問題:有時選的初始點會造成某一群會沒有所屬的點，變成除以0的錯誤
                     u[i] = coSet[i, 0] / coSet[i, 1];
+                }*/
+                //彩色
+                for (int i = 0; i < 3; i++)
+                {
+                    for (int j = 0; j < this.k; j++)
+                    {
+                        //待處理問題:有時選的初始點會造成某一群會沒有所屬的點，變成除以0的錯誤
+                        u[j, i] = coSet[j, 0, i] / coSet[j, 1, i];
+                    }
                 }
+
+                //印出檢查
+                //黑白
+                /*Console.Write("pre:");
+                for (int i = 0; i < u.Length; i++)
+                {
+                    Console.Write(pre_u[i] + ",");
+                }
+                Console.Write("\n");
+
+                Console.Write("u:");
+                for (int i = 0; i < u.Length; i++)
+                {
+                    Console.Write(u[i] + ",");
+                }
+                Console.Write("\n");*/
 
                 count++;
                 Console.Write(count + "\n");
-
+                
                 //比較新舊群中心
+                //黑白
                 bool u_equal = true;
-                for (int i = 0; i < u.Length; i++)
+                /*for (int i = 0; i < u.Length; i++)
                 {
                     if (u[i] != pre_u[i])
                         u_equal = false;
-                }
-                int count_u_equal = 0;
+                }*/
+                /*int count_u_equal = 0;
                 while (u_equal)
                 {
                     if (u[count_u_equal] != pre_u[count_u_equal])
@@ -665,17 +758,29 @@ namespace ImagePratice_1
                     count_u_equal++;
                     if (count_u_equal == u.Length)
                         break;
+                }*/
+                //彩色
+                for (int i = 0; i < 3; i++)
+                {
+                    for (int j = 0; j < this.k; j++)
+                    {
+                        if (u[j, i] != pre_u[j, i])
+                        {
+                            u_equal = false;
+                            break;
+                        }
+                    }
                 }
 
-                if (u_equal)
+                /*if (u_equal)
                     return 0;//@@
-                return cluster(u);//@@
+                return cluster(u);//@@*/
 
-                /*if(count<5)
+                if(count<10)
                     return cluster(u);
-
                 //需群中心、屬於哪個群
-                return 0;*/
+                return 0;
+                
             }
         }
     }
