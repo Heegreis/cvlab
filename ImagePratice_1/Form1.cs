@@ -132,7 +132,7 @@ namespace ImagePratice_1
             {
                 ImageForm MyImage = new ImageForm(openFileDialog1.FileName);
                 MyImage.Show();
-                MyImage.doKmeans(MyImage.getRGBData_unsafe(), 3);
+                MyImage.doKmeans(MyImage.getRGBData_unsafe(), 2);
             }
         }
     }
@@ -679,19 +679,19 @@ namespace ImagePratice_1
                         //彩色
                         for (int i = 0; i < 3; i++)
                         {
-                            double minDest = Math.Pow(rgbData[x, y, 0] - u[0, i], 2);
+                            double minDest = Math.Pow(rgbData[x, y, i] - u[0, i], 2);
                             group[x, y, i] = 0;
 
                             for (int j = 1; j < this.k; j++)
                             {
-                                if (Math.Pow(rgbData[x, y, 0] - u[j, i], 2) < minDest)
+                                if (Math.Pow(rgbData[x, y, i] - u[j, i], 2) < minDest)
                                 {
-                                    minDest = Math.Pow(rgbData[x, y, 0] - u[j, i], 2);
+                                    minDest = Math.Pow(rgbData[x, y, i] - u[j, i], 2);
                                     group[x, y, i] = j;
                                 }
                             }
                             //累加值
-                            coSet[group[x, y, i], 0, i] += rgbData[x, y, 0];
+                            coSet[group[x, y, i], 0, i] += rgbData[x, y, i];
                             //計算個數
                             coSet[group[x, y, i], 1, i]++;
                         }
