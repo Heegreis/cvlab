@@ -132,7 +132,7 @@ namespace ImagePratice_1
             {
                 ImageForm MyImage = new ImageForm(openFileDialog1.FileName);
                 MyImage.Show();
-                MyImage.doKmeans(MyImage.getRGBData_unsafe(), 2);
+                MyImage.doKmeans(MyImage.getRGBData_unsafe(), 5);
             }
         }
     }
@@ -530,22 +530,7 @@ namespace ImagePratice_1
             int Width = bimage.Width;
             int Height = bimage.Height;
 
-            /*設定 K 與 隨機初始值u(顏色)黑白
-            int[] u = new int[k];
-            for (int i = 0; i < k; i++)
-            {
-                Random rnd = new Random();
-                u[i] = rnd.Next(0, 255);
-                for (int j = 0; j < i; j++)
-                {
-                    while (u[j] == u[i])
-                    {
-                        j = 0;
-                        u[i] = rnd.Next(0, 255);
-                    }
-                }
-            }*/
-            //彩色
+            //設定 K 與 隨機初始值u(顏色)
             //u[k, R、G、B]
             int[,] u = new int[k,3];
             /*for (int i = 0; i < k; i++)
@@ -595,7 +580,7 @@ namespace ImagePratice_1
                         //黑白
                         /*newRGBData[x, y, i] = kmeansdata.u[kmeansdata.group[x, y]]; //u[group[x,y]]*/
                         //彩色
-                        newRGBData[x, y, i] = kmeansdata.u[kmeansdata.group[x, y, i], i];
+                        newRGBData[x, y, i] = kmeansdata.u[kmeansdata.group[x, y], i];
                     }
                 }
             }
@@ -611,15 +596,9 @@ namespace ImagePratice_1
             private int Width;
             private int Height;
             //紀錄圖片上每個點分別屬於哪個群
-            /*黑白
-            public int[,] group;*/
-            //彩色
-            public int[, ,] group;
-            //累加[x,0]此群值的集合與統計[x,1]群裡點的個數
-            /*黑白
-            private int[,] coSet;*/
-            //彩色
-            private int[, ,] coSet;
+            public int[,] group;
+            //累加此群值的集合[x,0~2]RGB、[x,3]統計群裡點的個數
+            private int[,] coSet;
 
             private int count;
 
@@ -631,8 +610,8 @@ namespace ImagePratice_1
                 this.u = new int[0, 0];
                 this.Width = 0;
                 this.Height = 0;
-                this.group = new int[0, 0, 0];
-                this.coSet = new int[0, 0 ,0];
+                this.group = new int[0, 0];
+                this.coSet = new int[0, 0];
 
                 this.count = 0;
             }
@@ -646,10 +625,9 @@ namespace ImagePratice_1
                 this.u = u;
                 this.Width = Width;
                 this.Height = Height;
-                this.group = new int[Width, Height, 3];
-                this.coSet = new int[k, 2, 3];
+                this.group = new int[Width, Height];
+                this.coSet = new int[k, 4];
 
-                //KmeansData kmeansdata = new KmeansData(this.rgbData, this.u, this.Width, this.Height);
                 cluster(this.u);
             }
 
@@ -660,106 +638,64 @@ namespace ImagePratice_1
                     for (int x = 0; x < Width; x++)
                     {
                         //分類點的群
-                        //黑白
-                        /*double minDest = Math.Pow(rgbData[x, y, 0] - u[0], 2);
+                        double minDest = Math.Sqrt(Math.Pow(rgbData[x, y, 0] - u[0, 0], 2) + Math.Pow(rgbData[x, y, 1] - u[0, 1], 2) + Math.Pow(rgbData[x, y, 2] - u[0, 2], 2));
                         group[x, y] = 0;
 
-                        for (int i = 1; i < u.Length; i++)
+                        for (int j = 1; j < this.k; j++)
                         {
-                            if (Math.Pow(rgbData[x, y, 0] - u[i], 2) < minDest)
+                            if ((Math.Sqrt(Math.Pow(rgbData[x, y, 0] - u[j, 0], 2) + Math.Pow(rgbData[x, y, 1] - u[j, 1], 2) + Math.Pow(rgbData[x, y, 2] - u[j, 2], 2))) < minDest)
                             {
-                                minDest = Math.Pow(rgbData[x, y, 0] - u[i], 2);
-                                group[x, y] = i;
+                                minDest = Math.Sqrt(Math.Pow(rgbData[x, y, 0] - u[j, 0], 2) + Math.Pow(rgbData[x, y, 1] - u[j, 1], 2) + Math.Pow(rgbData[x, y, 2] - u[j, 2], 2));
+                                group[x, y] = j;
                             }
                         }
                         //累加值
                         coSet[group[x, y], 0] += rgbData[x, y, 0];
+                        coSet[group[x, y], 1] += rgbData[x, y, 1];
+                        coSet[group[x, y], 2] += rgbData[x, y, 2];
                         //計算個數
-                        coSet[group[x, y], 1]++;*/
-                        //彩色
-                        for (int i = 0; i < 3; i++)
-                        {
-                            double minDest = Math.Pow(rgbData[x, y, i] - u[0, i], 2);
-                            group[x, y, i] = 0;
-
-                            for (int j = 1; j < this.k; j++)
-                            {
-                                if (Math.Pow(rgbData[x, y, i] - u[j, i], 2) < minDest)
-                                {
-                                    minDest = Math.Pow(rgbData[x, y, i] - u[j, i], 2);
-                                    group[x, y, i] = j;
-                                }
-                            }
-                            //累加值
-                            coSet[group[x, y, i], 0, i] += rgbData[x, y, i];
-                            //計算個數
-                            coSet[group[x, y, i], 1, i]++;
-                        }
+                        coSet[group[x, y], 3]++;
                         
                     }
                 }
                 //上一個群中心
-                //黑白
-                /*int[] pre_u = new int[u.Length];*/
-                //彩色
                 int[,] pre_u = new int[this.k, 3];
-
                 Array.Copy(u, pre_u, u.Length);
-                //計算中心
-                //黑白
-                /*for (int i = 0; i < u.Length; i++)
-                {
-                    //待處理問題:有時選的初始點會造成某一群會沒有所屬的點，變成除以0的錯誤
-                    u[i] = coSet[i, 0] / coSet[i, 1];
-                }*/
-                //彩色
+
+                //計算新中心
                 for (int i = 0; i < 3; i++)
                 {
                     for (int j = 0; j < this.k; j++)
                     {
                         //待處理問題:有時選的初始點會造成某一群會沒有所屬的點，變成除以0的錯誤
-                        u[j, i] = coSet[j, 0, i] / coSet[j, 1, i];
+                        u[j, i] = coSet[j, i] / coSet[j, 3];
                     }
                 }
 
                 //印出檢查
-                //黑白
-                /*Console.Write("pre:");
-                for (int i = 0; i < u.Length; i++)
+                Console.Write("pre:");
+                for (int i = 0; i < this.k; i++)
                 {
-                    Console.Write(pre_u[i] + ",");
+                    Console.Write("[" + pre_u[i, 0] + ",");
+                    Console.Write(pre_u[i, 1] + ",");
+                    Console.Write(pre_u[i, 2] + "]");
                 }
                 Console.Write("\n");
 
                 Console.Write("u:");
-                for (int i = 0; i < u.Length; i++)
+                for (int i = 0; i < this.k; i++)
                 {
-                    Console.Write(u[i] + ",");
+                    Console.Write("[" + u[i, 0] + ",");
+                    Console.Write(u[i, 1] + ",");
+                    Console.Write(u[i, 2] + "]");
                 }
-                Console.Write("\n");*/
+                Console.Write("\n");
 
                 count++;
                 Console.Write(count + "\n");
                 
                 //比較新舊群中心
-                //黑白
                 bool u_equal = true;
-                /*for (int i = 0; i < u.Length; i++)
-                {
-                    if (u[i] != pre_u[i])
-                        u_equal = false;
-                }*/
-                /*int count_u_equal = 0;
-                while (u_equal)
-                {
-                    if (u[count_u_equal] != pre_u[count_u_equal])
-                        u_equal = false;
-
-                    count_u_equal++;
-                    if (count_u_equal == u.Length)
-                        break;
-                }*/
-                //彩色
                 for (int i = 0; i < 3; i++)
                 {
                     for (int j = 0; j < this.k; j++)
