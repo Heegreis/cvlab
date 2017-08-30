@@ -132,7 +132,7 @@ namespace ImagePratice_1
             {
                 ImageForm MyImage = new ImageForm(openFileDialog1.FileName);
                 MyImage.Show();
-                MyImage.doKmeans(MyImage.getRGBData_unsafe(), 5);
+                MyImage.doKmeans(MyImage.getRGBData_unsafe(), 7);
             }
         }
     }
@@ -628,95 +628,91 @@ namespace ImagePratice_1
                 this.group = new int[Width, Height];
                 this.coSet = new int[k, 4];
 
-                cluster(this.u);
+                cluster();
             }
 
-            private int  cluster(int[,] u)
+            private void  cluster()
             {
-                for (int y = 0; y < Height; y++)
+                bool isQuit =false;
+                do
                 {
-                    for (int x = 0; x < Width; x++)
+                    for (int y = 0; y < Height; y++)
                     {
-                        //分類點的群
-                        double minDest = Math.Sqrt(Math.Pow(rgbData[x, y, 0] - u[0, 0], 2) + Math.Pow(rgbData[x, y, 1] - u[0, 1], 2) + Math.Pow(rgbData[x, y, 2] - u[0, 2], 2));
-                        group[x, y] = 0;
-
-                        for (int j = 1; j < this.k; j++)
+                        for (int x = 0; x < Width; x++)
                         {
-                            if ((Math.Sqrt(Math.Pow(rgbData[x, y, 0] - u[j, 0], 2) + Math.Pow(rgbData[x, y, 1] - u[j, 1], 2) + Math.Pow(rgbData[x, y, 2] - u[j, 2], 2))) < minDest)
+                            //分類點的群
+                            double minDest = Math.Sqrt(Math.Pow(rgbData[x, y, 0] - this.u[0, 0], 2) + Math.Pow(rgbData[x, y, 1] - this.u[0, 1], 2) + Math.Pow(rgbData[x, y, 2] - this.u[0, 2], 2));
+                            group[x, y] = 0;
+
+                            for (int j = 1; j < this.k; j++)
                             {
-                                minDest = Math.Sqrt(Math.Pow(rgbData[x, y, 0] - u[j, 0], 2) + Math.Pow(rgbData[x, y, 1] - u[j, 1], 2) + Math.Pow(rgbData[x, y, 2] - u[j, 2], 2));
-                                group[x, y] = j;
+                                if ((Math.Sqrt(Math.Pow(rgbData[x, y, 0] - this.u[j, 0], 2) + Math.Pow(rgbData[x, y, 1] - this.u[j, 1], 2) + Math.Pow(rgbData[x, y, 2] - this.u[j, 2], 2))) < minDest)
+                                {
+                                    minDest = Math.Sqrt(Math.Pow(rgbData[x, y, 0] - this.u[j, 0], 2) + Math.Pow(rgbData[x, y, 1] - this.u[j, 1], 2) + Math.Pow(rgbData[x, y, 2] - this.u[j, 2], 2));
+                                    group[x, y] = j;
+                                }
+                            }
+                            //累加值
+                            coSet[group[x, y], 0] += rgbData[x, y, 0];
+                            coSet[group[x, y], 1] += rgbData[x, y, 1];
+                            coSet[group[x, y], 2] += rgbData[x, y, 2];
+                            //計算個數
+                            coSet[group[x, y], 3]++;
+
+                        }
+                    }
+                    //上一個群中心
+                    int[,] pre_u = new int[this.k, 3];
+                    Array.Copy(this.u, pre_u, this.u.Length);
+
+                    //計算新中心
+                    for (int i = 0; i < 3; i++)
+                    {
+                        for (int j = 0; j < this.k; j++)
+                        {
+                            //待處理問題:有時選的初始點會造成某一群會沒有所屬的點，變成除以0的錯誤
+                            this.u[j, i] = coSet[j, i] / coSet[j, 3];
+                        }
+                    }
+
+                    //印出檢查
+                    Console.Write("pre:");
+                    for (int i = 0; i < this.k; i++)
+                    {
+                        Console.Write("[" + pre_u[i, 0] + ",");
+                        Console.Write(pre_u[i, 1] + ",");
+                        Console.Write(pre_u[i, 2] + "]");
+                    }
+                    Console.Write("\n");
+
+                    Console.Write("u:");
+                    for (int i = 0; i < this.k; i++)
+                    {
+                        Console.Write("[" + this.u[i, 0] + ",");
+                        Console.Write(this.u[i, 1] + ",");
+                        Console.Write(this.u[i, 2] + "]");
+                    }
+                    Console.Write("\n");
+
+                    count++;
+                    Console.Write(count + "\n");
+
+                    //比較新舊群中心
+                    bool u_equal = true;
+                    for (int i = 0; i < 3; i++)
+                    {
+                        for (int j = 0; j < this.k; j++)
+                        {
+                            if (this.u[j, i] != pre_u[j, i])
+                            {
+                                u_equal = false;
+                                break;
                             }
                         }
-                        //累加值
-                        coSet[group[x, y], 0] += rgbData[x, y, 0];
-                        coSet[group[x, y], 1] += rgbData[x, y, 1];
-                        coSet[group[x, y], 2] += rgbData[x, y, 2];
-                        //計算個數
-                        coSet[group[x, y], 3]++;
-                        
                     }
-                }
-                //上一個群中心
-                int[,] pre_u = new int[this.k, 3];
-                Array.Copy(u, pre_u, u.Length);
-
-                //計算新中心
-                for (int i = 0; i < 3; i++)
-                {
-                    for (int j = 0; j < this.k; j++)
-                    {
-                        //待處理問題:有時選的初始點會造成某一群會沒有所屬的點，變成除以0的錯誤
-                        u[j, i] = coSet[j, i] / coSet[j, 3];
-                    }
-                }
-
-                //印出檢查
-                Console.Write("pre:");
-                for (int i = 0; i < this.k; i++)
-                {
-                    Console.Write("[" + pre_u[i, 0] + ",");
-                    Console.Write(pre_u[i, 1] + ",");
-                    Console.Write(pre_u[i, 2] + "]");
-                }
-                Console.Write("\n");
-
-                Console.Write("u:");
-                for (int i = 0; i < this.k; i++)
-                {
-                    Console.Write("[" + u[i, 0] + ",");
-                    Console.Write(u[i, 1] + ",");
-                    Console.Write(u[i, 2] + "]");
-                }
-                Console.Write("\n");
-
-                count++;
-                Console.Write(count + "\n");
-                
-                //比較新舊群中心
-                bool u_equal = true;
-                for (int i = 0; i < 3; i++)
-                {
-                    for (int j = 0; j < this.k; j++)
-                    {
-                        if (u[j, i] != pre_u[j, i])
-                        {
-                            u_equal = false;
-                            break;
-                        }
-                    }
-                }
-
-                /*if (u_equal)
-                    return 0;//@@
-                return cluster(u);//@@*/
-
-                if(count<10)
-                    return cluster(u);
-                //需群中心、屬於哪個群
-                return 0;
-                
+                    if (u_equal)
+                        isQuit = true;
+                } while (count < 10 && !isQuit);
             }
         }
     }
