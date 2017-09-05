@@ -135,6 +135,77 @@ namespace ImagePratice_1
                 MyImage.doKmeans(MyImage.getRGBData_unsafe(), 7);
             }
         }
+
+        private void button10_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog1 = new OpenFileDialog();
+            openFileDialog1.InitialDirectory = "C:\\Users\\BrianLiu\\Documents\\Visual Studio 2013\\Projects\\ImagePratice_1\\src\\";
+
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                ImageForm MyImage = new ImageForm(openFileDialog1.FileName);
+                MyImage.Show();
+                MyImage.doSobel(MyImage.getRGBData_unsafe());
+            }
+        }
+
+        private void button11_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog1 = new OpenFileDialog();
+            openFileDialog1.InitialDirectory = "C:\\Users\\BrianLiu\\Documents\\Visual Studio 2013\\Projects\\ImagePratice_1\\src\\";
+
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                ImageForm MyImage = new ImageForm(openFileDialog1.FileName);
+                MyImage.Show();
+                MyImage.doBinaryThresholding(MyImage.getRGBData_unsafe());
+                MyImage.doErosion(MyImage.getRGBData_unsafe());
+            }
+        }
+
+        private void button12_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog1 = new OpenFileDialog();
+            openFileDialog1.InitialDirectory = "C:\\Users\\BrianLiu\\Documents\\Visual Studio 2013\\Projects\\ImagePratice_1\\src\\";
+
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                ImageForm MyImage = new ImageForm(openFileDialog1.FileName);
+                MyImage.Show();
+                MyImage.doBinaryThresholding(MyImage.getRGBData_unsafe());
+                MyImage.doDilation(MyImage.getRGBData_unsafe());
+            }
+        }
+
+        private void button13_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog1 = new OpenFileDialog();
+            openFileDialog1.InitialDirectory = "C:\\Users\\BrianLiu\\Documents\\Visual Studio 2013\\Projects\\ImagePratice_1\\src\\";
+
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                ImageForm MyImage = new ImageForm(openFileDialog1.FileName);
+                MyImage.Show();
+                MyImage.doBinaryThresholding(MyImage.getRGBData_unsafe());
+                MyImage.doErosion(MyImage.getRGBData_unsafe());
+                MyImage.doDilation(MyImage.getRGBData_unsafe());
+            }
+        }
+
+        private void button14_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog1 = new OpenFileDialog();
+            openFileDialog1.InitialDirectory = "C:\\Users\\BrianLiu\\Documents\\Visual Studio 2013\\Projects\\ImagePratice_1\\src\\";
+
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                ImageForm MyImage = new ImageForm(openFileDialog1.FileName);
+                MyImage.Show();
+                MyImage.doBinaryThresholding(MyImage.getRGBData_unsafe());
+                MyImage.doDilation(MyImage.getRGBData_unsafe());
+                MyImage.doErosion(MyImage.getRGBData_unsafe());
+            }
+        }
     }
 
     //顯示圖片的Form類別(新視窗)
@@ -523,7 +594,6 @@ namespace ImagePratice_1
         }
 
         //k-means 分群法
-        public int kmeansCount = 0;
         public void doKmeans(int[, ,] rgbData, int k)
         {
             Bitmap bimage = new Bitmap(image);
@@ -565,7 +635,6 @@ namespace ImagePratice_1
                 Console.Write(u[0, i] + "," + u[1, i] + "," + u[2, i] + "\n");
             }*/
 
-            kmeansCount = 0;
             //遞迴->統計、歸類->新群
             KmeansData kmeansdata = new KmeansData(rgbData, k, u, Width, Height);
 
@@ -714,6 +783,143 @@ namespace ImagePratice_1
                         isQuit = true;
                 } while (count < 10 && !isQuit);
             }
+        }
+
+        //Sobel 邊緣偵測
+        public void doSobel(int[, ,] rgbData)
+        {
+            Bitmap bimage = new Bitmap(image);
+            int Width = bimage.Width;
+            int Height = bimage.Height;
+
+            int[] VerticalSobelOperator = new int[] { -1, 0, 1, -2, 0, 2, -1, 0, 1 };
+            int[] HorizontalSobelOperator = new int[] { -1, -2, -1, 0, 0, 0, 1, 2, 1 };
+
+            int[, ,] newRGBData = new int[Width, Height, 3];
+            for (int y = 1; y < Height - 1; y++)
+            {
+                for (int x = 1; x < Width - 1; x++)
+                {
+                    //觀察窗3*3設值
+                    int[,] window = new int[9, 3];
+                    int windowKey = 0;
+                    for (int yy = y - 1; yy < y + 2; yy++)
+                    {
+                        for (int xx = x - 1; xx < x + 2; xx++)
+                        {
+                            for (int i = 0; i < 3; i++)
+                            {
+                                window[windowKey, i] = rgbData[xx, yy, i];
+                            }
+                            windowKey++;
+                        }
+                    }
+                    //Mask運算
+                    for (int i = 0; i < 3; i++)
+                    {
+                        int VerticalSobel = 0;
+                        int HorizontalSobel = 0;
+                        for(int j = 0; j < 9; j++)
+                        {
+                            VerticalSobel += VerticalSobelOperator[j] * window[j, i];
+                            HorizontalSobel += HorizontalSobelOperator[j] * window[j, i];
+                        }
+
+                        newRGBData[x, y, i] = (int)Math.Sqrt(Math.Pow(VerticalSobel, 2) + Math.Pow(HorizontalSobel, 2));
+                    }
+                }
+            }
+            setRGBData_unsafe(newRGBData);
+        }
+
+        //Erosion 侵蝕-形態學
+        public void doErosion(int[, ,] rgbData)
+        {
+            Bitmap bimage = new Bitmap(image);
+            int Width = bimage.Width;
+            int Height = bimage.Height;
+
+            int[, ,] newRGBData = new int[Width, Height, 3];
+            for (int y = 1; y < Height - 1; y++)
+            {
+                for (int x = 1; x < Width - 1; x++)
+                {
+                    //觀察窗3*3判斷值
+                    //int[] window = new int[9];
+                    int windowKey = 0;
+                    bool isErosion = true;
+                    for (int yy = y - 1; yy < y + 2; yy++)
+                    {
+                        for (int xx = x - 1; xx < x + 2; xx++)
+                        {
+                            //window[windowKey] = rgbData[xx, yy, 0];   
+                            windowKey++;
+                            if (windowKey == 5)
+                                continue;
+                            if (rgbData[xx, yy, 0] == 0)
+                            {
+                                isErosion = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (isErosion)
+                    {
+                        for (int i = 0; i < 3; i++)
+                        {
+                            newRGBData[x, y, i] = 255;
+                        }
+                    }
+                }
+            }
+
+            setRGBData_unsafe(newRGBData);
+        }
+
+        //Dilation 膨脹-形態學
+        public void doDilation(int[, ,] rgbData)
+        {
+            Bitmap bimage = new Bitmap(image);
+            int Width = bimage.Width;
+            int Height = bimage.Height;
+
+            int[, ,] newRGBData = new int[Width, Height, 3];
+            for (int y = 1; y < Height - 1; y++)
+            {
+                for (int x = 1; x < Width - 1; x++)
+                {
+                    //觀察窗3*3判斷值
+                    //int[] window = new int[9];
+                    int windowKey = 0;
+                    bool isDilation = false;
+                    for (int yy = y - 1; yy < y + 2; yy++)
+                    {
+                        for (int xx = x - 1; xx < x + 2; xx++)
+                        {
+                            //window[windowKey] = rgbData[xx, yy, 0];   
+                            windowKey++;
+                            if (windowKey == 5)
+                                continue;
+                            if (rgbData[xx, yy, 0] == 255)
+                            {
+                                isDilation = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (isDilation)
+                    {
+                        for (int i = 0; i < 3; i++)
+                        {
+                            newRGBData[x, y, i] = 255;
+                        }
+                    }
+                }
+            }
+
+            setRGBData_unsafe(newRGBData);
         }
     }
 }
