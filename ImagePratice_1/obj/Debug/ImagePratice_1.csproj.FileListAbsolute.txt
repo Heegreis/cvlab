@@ -1,9 +1,0 @@
-c:\users\brianliu\documents\visual studio 2013\Projects\ImagePratice_1\ImagePratice_1\bin\Debug\ImagePratice_1.exe.config
-c:\users\brianliu\documents\visual studio 2013\Projects\ImagePratice_1\ImagePratice_1\bin\Debug\ImagePratice_1.exe
-c:\users\brianliu\documents\visual studio 2013\Projects\ImagePratice_1\ImagePratice_1\bin\Debug\ImagePratice_1.pdb
-c:\users\brianliu\documents\visual studio 2013\Projects\ImagePratice_1\ImagePratice_1\obj\Debug\ImagePratice_1.csprojResolveAssemblyReference.cache
-c:\users\brianliu\documents\visual studio 2013\Projects\ImagePratice_1\ImagePratice_1\obj\Debug\ImagePratice_1.Form1.resources
-c:\users\brianliu\documents\visual studio 2013\Projects\ImagePratice_1\ImagePratice_1\obj\Debug\ImagePratice_1.Properties.Resources.resources
-c:\users\brianliu\documents\visual studio 2013\Projects\ImagePratice_1\ImagePratice_1\obj\Debug\ImagePratice_1.csproj.GenerateResource.Cache
-c:\users\brianliu\documents\visual studio 2013\Projects\ImagePratice_1\ImagePratice_1\obj\Debug\ImagePratice_1.exe
-c:\users\brianliu\documents\visual studio 2013\Projects\ImagePratice_1\ImagePratice_1\obj\Debug\ImagePratice_1.pdb
