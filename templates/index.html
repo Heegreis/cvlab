@@ -12,19 +12,40 @@
     <title>index</title>
 </head>
 <body>
-    <div class="input-group mb-3">
-        <div class="input-group-prepend">
-            <span class="input-group-text">選擇輸入圖片</span>
+    <nav class="navbar navbar-expand-md navbar-light bg-light">
+        <a class="navbar-brand" href="">Basic Digital Image Processing</a>
+    </nav>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-6">
+                <img class="img-fluid" id="input_img" src="">
+            </div>
+            <div class="col-6">
+                <img class="img-fluid" id="output_img" src="">
+            </div>
         </div>
-        <div class="custom-file">
-            <input type="file" class="custom-file-input" id="imageinput" name="image" onchange="readUrl(this)">
-            <label class="custom-file-label" for="imageinput">選擇圖片</label>
+        <div class="row">
+            <div class="container"> <!-- 操作區 -->
+                <div class="row">
+                    <div class="input-group"> <!-- 選擇圖片 -->
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">選擇輸入圖片</span>
+                        </div>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="imageinput" name="image" onchange="readUrl(this)">
+                            <label class="custom-file-label" for="imageinput">選擇圖片</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <button type="button" class="btn btn-primary" onclick="process()">執行</button>
+                </div>
+                <!-- 各功能 -->
+                <div class="row">
+                    
+                </div>
+            </div>
         </div>
     </div>
-    
-    <button type="button" class="btn btn-primary" onclick="process()">Primary</button>
-	<hr>
-    <img id="input_img" src="">
-    <img id="output_img" src="">
 </body>
 </html>

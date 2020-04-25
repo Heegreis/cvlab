@@ -33,10 +33,9 @@ function readUrl(input) {
 		let reader = new FileReader();
 		reader.onload = function (e) {
 			// console.log(e)
-
 			imagebox.attr('src', e.target.result);
-			imagebox.height(300);
-			imagebox.width(300);
+			// imagebox.height(300);
+			// imagebox.width(300);
 		}
 		reader.readAsDataURL(input.files[0]);
 	}
