@@ -1,1 +1,1 @@
-# flask-bootstrap-init
+# Basic Digital Image Processing
