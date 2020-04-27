@@ -8,7 +8,6 @@
     <script src="{{url_for('static',filename='dist/jquery-3.5.0.min.js')}}"></script>
     <script src="{{url_for('static',filename='dist/popper.min.js')}}"></script>
     <script src="{{url_for('static',filename='dist/bootstrap-4.4.1-dist/js/bootstrap.min.js')}}"></script>
-    <script src="{{url_for('static',filename='js/app.js')}}"></script>
     <title>index</title>
 </head>
 <body>
@@ -42,10 +41,17 @@
                 </div>
                 <!-- 各功能 -->
                 <div class="row">
-                    
+                    <form action="/" method="post" id="idForm">
+                        <input name="algorithm" type="checkbox" value="b">b
+                        <input type="text" name="b:th" id="">
+                        <input name="algorithm" type="checkbox" value="c">c
+                        <input name="algorithm" type="checkbox" value="a">a
+                        <input type="submit" value="送出表單">
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 </body>
+<script src="{{url_for('static',filename='js/app.js')}}"></script>
 </html>

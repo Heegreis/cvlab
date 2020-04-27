@@ -4,8 +4,9 @@ function process() {
 	if (input.files && input.files[0]) {
 		let formData = new FormData();
 		formData.append('image', input.files[0]);
+		formData.append('algorithm', 'gosh');
 		$.ajax({
-			url: "/maskImage", // fix this to your liking
+			url: "/process", // fix this to your liking
 			type: "POST",
 			data: formData,
 			cache: false,
@@ -40,3 +41,28 @@ function readUrl(input) {
 		reader.readAsDataURL(input.files[0]);
 	}
 }
+
+// this is the id of the form
+$("#idForm").submit(function(e) {
+
+    var form = $(this);
+	var url = form.attr('action');
+
+    $.ajax({
+			type: "POST",
+			url: url,
+			data: form.serialize(), // serializes the form's elements.
+			// cache: false,
+			success: function()
+			{
+			//    alert(data); // show response from the php script.
+			console.log('sucess!')
+			},
+			error: function (data) {
+				console.log("upload error", data);
+				console.log(data.getAllResponseHeaders());
+			}
+    });
+
+	e.preventDefault(); // avoid to execute the actual submit of the form.
+});
