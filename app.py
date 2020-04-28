@@ -12,20 +12,19 @@ app = Flask(__name__)
 
 @app.route('/process', methods=['POST'])
 def process():
-    # print(request.files , file=sys.stderr)
-    file = request.files['image'].read() ## byte file
-    npimg = np.frombuffer(file, np.uint8)
+    img_b64encode = request.form.get('image')
+    img_b64decode = base64.b64decode(img_b64encode)  # base64解码
+    npimg = np.frombuffer(img_b64decode,np.uint8) # 转换np序列
     img = cv2.imdecode(npimg,cv2.IMREAD_COLOR)
     ######### Do preprocessing here ################
-    algorithm = request.form.get('algorithm')
+    algorithm = request.form.getlist('algorithm')
     print(algorithm)
+    b_th = request.form.get('b:th')
+    print(b_th)
     # img = imgProcess(img, algorithm)
     ################################################
-    img = Image.fromarray(img.astype("uint8"))
-    rawBytes = io.BytesIO()
-    img.save(rawBytes, "JPEG")
-    rawBytes.seek(0)
-    img_base64 = base64.b64encode(rawBytes.read())
+    img = cv2.imencode('.jpeg', img)[1]
+    img_base64 = base64.b64encode(img)
     return jsonify({'status':str(img_base64)})
 
 
@@ -46,15 +45,8 @@ def test():
     print(b_th)
     return render_template('test.html')
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
 def index():
-    if request.method == 'POST':
-        algorithm = request.form.getlist('algorithm')
-        print(algorithm)
-        b_th = request.form.get('b:th')
-        print(b_th)
-        img = request.form.get('img')
-        print(img)
     return render_template('index.html')
 
 if __name__ == '__main__':
