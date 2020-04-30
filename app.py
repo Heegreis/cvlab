@@ -19,9 +19,9 @@ def process():
     ######### Do preprocessing here ################
     algorithm = request.form.getlist('algorithm')
     print(algorithm)
-    b_th = request.form.get('b:th')
-    print(b_th)
-    # img = imgProcess(img, algorithm)
+    # b_th = request.form.get('b:th')
+    # print(b_th)
+    img = imgProcess(img, algorithm)
     ################################################
     img = cv2.imencode('.jpeg', img)[1]
     img_base64 = base64.b64encode(img)
@@ -36,13 +36,8 @@ def after_request(response):
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
     return response
 
-@app.route('/test', methods=['POST'])
+@app.route('/test')
 def test():
-    algorithm = request.form.getlist('algorithm')
-    # hello = request.form.getlist('hello')
-    print(algorithm)
-    b_th = request.form.get('b:th')
-    print(b_th)
     return render_template('test.html')
 
 @app.route('/')

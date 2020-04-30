@@ -1,8 +1,8 @@
 import cv2
 
 
-def Gray(img):
-    img[img > 150] = 0
+def gray(img):
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     return img
 
 def Negative(img):
@@ -29,9 +29,6 @@ def Sobel(img):
 def Erosion(img):
     pass
 
-def Erosion(img):
-    pass
-
 def Dilation(img):
     pass
 
@@ -43,7 +40,7 @@ def Closing(img):
 
 def imgProcess(img, algorithm):
     algorithms = {
-        'Gray': Gray,
+        'gray': gray,
         'Negative': Negative,
         'Powerlaw': Powerlaw,
         'BinaryThresholding': BinaryThresholding,
@@ -56,4 +53,6 @@ def imgProcess(img, algorithm):
         'Opening': Opening,
         'Closing': Closing
     }
-    pass
+    for algo in algorithm:
+        img = algorithms[algo](img)
+    return img

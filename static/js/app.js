@@ -1,3 +1,5 @@
+document.write("<script src='/static/js/drag.js'></script>");
+
 function readUrl(input) {
 	imagebox = $('#input_img')
 	console.log("evoked readUrl")
@@ -50,3 +52,13 @@ $("#process").submit(function (e) {
 	}
 	e.preventDefault(); // avoid to execute the actual submit of the form.
 });
+
+function addAlgorithm(myObj) {
+	// alert("id 為: " + myObj.id);
+	if ($('#' + myObj.id).is(":checked")) {
+		$("#todo").append($("#" + myObj.id + "-Form"))
+	} else {
+		$("#" + myObj.id + "-Row").append($("#" + myObj.id + "-Form"))
+	}
+	enableDragSort('drag-sort-enable')
+}
