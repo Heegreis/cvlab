@@ -16,13 +16,14 @@ def process():
     img_b64decode = base64.b64decode(img_b64encode)  # base64解码
     npimg = np.frombuffer(img_b64decode,np.uint8) # 转换np序列
     img = cv2.imdecode(npimg,cv2.IMREAD_COLOR)
-    ######### Do preprocessing here ################
-    algorithm = request.form.getlist('algorithm')
-    print(algorithm)
-    # b_th = request.form.get('b:th')
-    # print(b_th)
-    img = imgProcess(img, algorithm)
-    ################################################
+
+    algorithms = request.form.getlist('algorithm')
+    args = {}
+    for key in request.form.keys():
+        if key != 'image' and key != 'algorithm':
+            args[key] = request.values.get(key)
+    img = imgProcess(img, algorithms, args)
+
     img = cv2.imencode('.jpeg', img)[1]
     img_base64 = base64.b64encode(img)
     return jsonify({'status':str(img_base64)})

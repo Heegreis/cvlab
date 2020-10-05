@@ -16,6 +16,9 @@ function readUrl(input) {
 }
 
 $("#process").submit(function (e) {
+	$("#submit").addClass('disabled');
+	$("#loading").removeClass('d-none');
+	
 	var form = $(this);
 	var url = form.attr('action');
 	
@@ -24,9 +27,10 @@ $("#process").submit(function (e) {
 	if (input_img.attr('src') != '') {
 		input_img_base64 = input_img.attr('src').split(',')[1]
 
-		var tmpInput = $("<input name='image' id='image'/>");
+		var tmpInput = $("<input type='hidden' name='image' id='image'/>");
 		tmpInput.attr("value", input_img_base64);
 		form.append(tmpInput);
+		// tmpInput.remove();
 
 		$.ajax({
 			type: "POST",
@@ -36,6 +40,8 @@ $("#process").submit(function (e) {
 			// processData: false,
 			// contentType: false,
 			success: function (data) {
+				$("#submit").removeClass('disabled');
+				$("#loading").addClass('d-none');
 				tmpInput.remove();
 				// alert("hello"); // if it's failing on actual server check your server FIREWALL + SET UP CORS
 				bytestring = data['status']
@@ -51,6 +57,7 @@ $("#process").submit(function (e) {
 		});
 	}
 	e.preventDefault(); // avoid to execute the actual submit of the form.
+	$('#submit').blur()
 });
 
 function addAlgorithm(myObj) {

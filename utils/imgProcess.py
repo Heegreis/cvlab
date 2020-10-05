@@ -1,58 +1,71 @@
 import cv2
 
 
-def gray(img):
+def gray(img, args):
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     return img
 
-def Negative(img):
+def negative(img, args):
+    rows = img.shape[0]
+    cols = img.shape[1] 
+    for r in range(rows):
+        for c in range(cols):
+            img[r, c, 0] = 255-img[r, c, 0]
+            img[r, c, 1] = 255-img[r, c, 1]
+            img[r, c, 2] = 255-img[r, c, 2]
+    return img
+
+def powerlaw(img):
     pass
 
-def Powerlaw(img):
+def binaryThresholding(img):
     pass
 
-def BinaryThresholding(img):
+def histogramEqualization(img):
     pass
 
-def HistogramEqualization(img):
+def medianFilter(img):
     pass
 
-def MedianFilter(img):
+def kmeans(img):
     pass
 
-def Kmeans(img):
+def sobel(img):
     pass
 
-def Sobel(img):
+def erosion(img):
     pass
 
-def Erosion(img):
+def dilation(img):
     pass
 
-def Dilation(img):
+def opening(img):
     pass
 
-def Opening(img):
+def closing(img):
     pass
 
-def Closing(img):
-    pass
+def test(img, args):
+    arg1 = args['test-arg1']
+    print(arg1)
+    return img
 
-def imgProcess(img, algorithm):
-    algorithms = {
+def imgProcess(img, algorithms, args):
+    algorithmDict = {
         'gray': gray,
-        'Negative': Negative,
-        'Powerlaw': Powerlaw,
-        'BinaryThresholding': BinaryThresholding,
-        'HistogramEqualization': HistogramEqualization,
-        'MedianFilter': MedianFilter,
-        'Kmeans': Kmeans,
-        'Sobel': Sobel,
-        'Erosion': Erosion,
-        'Dilation': Dilation,
-        'Opening': Opening,
-        'Closing': Closing
+        'negative': negative,
+        'powerlaw': powerlaw,
+        'binaryThresholding': binaryThresholding,
+        'histogramEqualization': histogramEqualization,
+        'medianFilter': medianFilter,
+        'kmeans': kmeans,
+        'sobel': sobel,
+        'erosion': erosion,
+        'dilation': dilation,
+        'opening': opening,
+        'closing': closing,
+        'test': test
     }
-    for algo in algorithm:
-        img = algorithms[algo](img)
+    for algo in algorithms:
+        img = algorithmDict[algo](img, args)
     return img
