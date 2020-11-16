@@ -1,1 +1,1 @@
-# Basic Digital Image Processing
+# CV Lab
