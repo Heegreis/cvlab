@@ -22,8 +22,10 @@ def nothing(x):
     pass
 
 def doSome():
-    time.sleep(3)
+    time.sleep(1)
     return "done"
+
+
 
 if __name__ == "__main__":
     args = parse_args()
@@ -104,47 +106,48 @@ if __name__ == "__main__":
             print(name, f'{i+1}/{len(input_paths)}')
 
             if args.photoshop:
-                cv2.namedWindow('image')
+                cv2.namedWindow("control panel")
+                cv2.createTrackbar("R", "control panel", 0, 255, nothing)
+                cv2.createTrackbar("G", "control panel", 0, 255, nothing)
+                cv2.createTrackbar("B", "control panel", 0, 255, nothing)
                 while(1):
                     # cv2.namedWindow("control panel")
                     # cv2.createTrackbar("R", "control panel", 0, 255, nothing)
                     # cv2.createTrackbar("G", "control panel", 0, 255, nothing)
                     # cv2.createTrackbar("B", "control panel", 0, 255, nothing)
-                    cv2.createTrackbar('R','image',0,255,nothing)
-                    cv2.createTrackbar('G','image',0,255,nothing)
-                    cv2.createTrackbar('B','image',0,255,nothing)
+                    
 
-                    # value['r'] = cv2.getTrackbarPos('R','control panel')
-                    # value['g'] = cv2.getTrackbarPos('G','control panel')
-                    # value['b'] = cv2.getTrackbarPos('B','control panel')
+                    value['r'] = cv2.getTrackbarPos('R','control panel')
+                    value['g'] = cv2.getTrackbarPos('G','control panel')
+                    value['b'] = cv2.getTrackbarPos('B','control panel')
 
-                    # if value != tmp_value:
-                    #     tmp_value = value
-                    #     print("start")
-                    #     # 執行ps
-                    #     d = doSome()
-                    #     print(d)
+                    if value != tmp_value:
+                        tmp_value = value
+                        print("start")
+                        # 執行ps
+                        d = doSome()
+                        print(d)
 
                     key = cv2.waitKey(1) & 0xFF
-                #     if key == ord('d'):
-                #         i += 1
-                #         if i >= len(input_paths[0]):
-                #             i = len(input_paths[0]) - 1
-                #         ps_status = 'd'
-                #         break
-                #     if key == ord('a'):
-                #         i -= 1
-                #         if i < 0:
-                #             i = 0
-                #         ps_status = 'a'
-                #         break
-                #     if key == ord('q'):
-                #         ps_status = 'q'
-                #         break
-                # if ps_status == 'd' or ps_status == 'a':
-                #     continue
-                # if ps_status == 'q':
-                #     break
+                    if key == ord('d'):
+                        i += 1
+                        if i >= len(input_paths[0]):
+                            i = len(input_paths[0]) - 1
+                        ps_status = 'd'
+                        break
+                    if key == ord('a'):
+                        i -= 1
+                        if i < 0:
+                            i = 0
+                        ps_status = 'a'
+                        break
+                    if key == ord('q'):
+                        ps_status = 'q'
+                        break
+                if ps_status == 'd' or ps_status == 'a':
+                    continue
+                if ps_status == 'q':
+                    break
 
 
             key = cv2.waitKey(0) & 0xFF
