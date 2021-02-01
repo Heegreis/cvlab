@@ -3,8 +3,10 @@ import cv2
 import os
 import sys
 from utils.cvlab import Cvlab
+from utils.img_process import *
 import argparse
 import time
+import glob
 
 def parse_args(in_args=None):
     parser = argparse.ArgumentParser(description="Image viewer")
@@ -21,9 +23,10 @@ def parse_args(in_args=None):
 def nothing(x):
     pass
 
-def doSome():
+def doSome(img, value):
+    
     time.sleep(1)
-    return "done"
+    return img
 
 
 
@@ -93,6 +96,8 @@ if __name__ == "__main__":
         if args.photoshop:
             value = {}
             tmp_value = {}
+            ps_path = ""
+            tmp_ps_path = ""
         while(i >=0 and i < len(input_paths[0])):
             path = input_paths[i]
 
@@ -107,32 +112,31 @@ if __name__ == "__main__":
 
             if args.photoshop:
                 cv2.namedWindow("control panel")
-                cv2.createTrackbar("R", "control panel", 0, 255, nothing)
-                cv2.createTrackbar("G", "control panel", 0, 255, nothing)
-                cv2.createTrackbar("B", "control panel", 0, 255, nothing)
+                cv2.createTrackbar("brightness", "control panel", 0, 255, nothing)
+                cv2.createTrackbar("contrast", "control panel", 0, 255, nothing)
+                cv2.createTrackbar("contrast_mid_threshold", "control panel", 0, 255, nothing)
                 while(1):
-                    # cv2.namedWindow("control panel")
-                    # cv2.createTrackbar("R", "control panel", 0, 255, nothing)
-                    # cv2.createTrackbar("G", "control panel", 0, 255, nothing)
-                    # cv2.createTrackbar("B", "control panel", 0, 255, nothing)
-                    
+                    value['brightness'] = cv2.getTrackbarPos('brightness','control panel')
+                    value['contrast'] = cv2.getTrackbarPos('contrast','control panel')
+                    value['contrast_mid_threshold'] = cv2.getTrackbarPos('contrast_mid_threshold','control panel')
+                    ps_path = path
 
-                    value['r'] = cv2.getTrackbarPos('R','control panel')
-                    value['g'] = cv2.getTrackbarPos('G','control panel')
-                    value['b'] = cv2.getTrackbarPos('B','control panel')
-
-                    if value != tmp_value:
-                        tmp_value = value
+                    if value != tmp_value or ps_path != tmp_ps_path:
+                        tmp_value = value.copy()
+                        img_edit = img.copy()
+                        tmp_ps_path = ps_path
                         print("start")
                         # 執行ps
-                        d = doSome()
-                        print(d)
+                        img_edit = contrast_and_brightness(img_edit, value)
+                        print("ebd")
+                        cv2.namedWindow("edit", cv2.WINDOW_NORMAL)
+                        cv2.imshow("edit", img_edit)
 
-                    key = cv2.waitKey(1) & 0xFF
+                    key = cv2.waitKey(5) & 0xFF
                     if key == ord('d'):
                         i += 1
-                        if i >= len(input_paths[0]):
-                            i = len(input_paths[0]) - 1
+                        if i >= len(input_paths):
+                            i = len(input_paths) - 1
                         ps_status = 'd'
                         break
                     if key == ord('a'):
@@ -149,12 +153,11 @@ if __name__ == "__main__":
                 if ps_status == 'q':
                     break
 
-
             key = cv2.waitKey(0) & 0xFF
             if key == ord('d'):
                 i += 1
-                if i >= len(input_paths[0]):
-                    i = len(input_paths[0]) - 1
+                if i >= len(input_paths):
+                    i = len(input_paths) - 1
                 continue
             if key == ord('a'):
                 i -= 1
