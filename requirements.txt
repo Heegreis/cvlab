@@ -1,2 +1,3 @@
 # python=3.6 above not sure
-opencv-python
+opencv-python==4.4.0.46
+Flask==1.1.2
